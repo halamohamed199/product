@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+</head>
+<style>
+  body{
+    background-color: #1abc9c;
+      color: black;
+  }
+  h2{
+    text-align: center;
+  }
+  
+</style>
+<script type="text/javascript">
+(function(){
+angular.module("myApp", []);
+angular.module('myApp').config(function($interpolateProvider) {
+  $interpolateProvider.startSymbol('{[{');
+  $interpolateProvider.endSymbol('}]}');
+});
+angular.module('myApp').factory('Product',function($http){
+  var Product = {};
+  Product.all = function  () {
+    return $http.get('/products');
+  }
+  Product.create = function(product){
+    return $http.post('/products/',product);
+  }
+  Product.update = function(product){
+    return $http.put('/products/'+product.id+'/',product);
+  }
+  Product.destroy = function(product){
+    return $http.delete('/products/'+product.id+'/',product);
+  }
+  return Product;
+})
+angular.module('myApp').controller("myCtrl", function($scope, Product) {
+  Product.all().then(function(response){
+    $scope.products = response.data;
+  })
+  $scope.products = []
+  $scope.addProduct = function(product){
+    Product.create(product).then(function(response){
+      $scope.products.push(response.data);
+    })
+  }
+  $scope.updateProduct = function(){
+    Product.update($scope.currentProduct);
+  }
+  $scope.destroyProduct = function(idx){
+    Product.destroy($scope.products[idx]);
+  }
+  $scope.setCurrentProduct = function  (idx) {
+    $scope.currentProduct = $scope.products[idx];
+  }
+  $scope.title = 'Title';
+});
+})()
+</script>
+<body ng-app="myApp" ng-controller="myCtrl">
+
+<div class="container">
+  <h2>{[{ title }]}</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th> 
+        <th>Quantity</th>
+        <th>Category</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="x in products">
+        <td>{[{x.id}]}</td>
+        <td>{[{x.name}]}</td>
+        <td>{[{x.quantity}]}</td>
+        <td>{[{x.category}]}</td>
+        <td> <button type="button" id="update" class="btn btn-primary" ng-click="setCurrentProduct($index)" data-toggle="modal" data-target="#updateModal">Update</button></td>
+        <td> <button type="button" id="delete" class="btn btn-danger" ng-click="destroy($index)" data-toggle="modal">Delete</button></td>
+      </tr >    
+    </tbody>
+  </table>
+  <button type="button" id="add" class="btn btn-primary" data-toggle="modal" data-target="#addModal">Add</button>
+</div>
+
+  <!-- Add Modal -->
+  <div class="modal fade" id="addModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Add Product</h4>
+        </div>
+        <form>
+		  <div class="form-group" ng-init="product = {}">
+		    <label>Name</label><br>
+		    <input ng-model="product.name" type="text"><br>
+		    <label>Quantity</label><br>
+		    <input ng-model="product.quantity" type="number"><br>
+		    <label>Category</label><br>
+		    <input ng-model="product.category" type="text"><br>
+		  	<button data-dismiss="modal" ng-click="addProduct(product)" class="btn btn-primary">save</button>
+		  </div>
+		</form>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal fade" id="updateModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Edit Product</h4>
+        </div>
+        <form>
+		  <div class="form-group">
+		    <label>Name</label><br>
+		    <input ng-model="currentProduct.name" type="text"><br>
+		    <label>Quantity</label><br>
+		    <input ng-model="currentProduct.quantity" type="number"><br>
+		    <label>Category</label><br>
+		    <input ng-model="currentProduct.category" type="text"><br>
+		  	<button data-dismiss="modal" ng-click="updateProduct()" class="btn btn-primary">save</button>
+		  </div>
+		</form>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+</div>
+
+</body>
+</html>

@@ -23,10 +23,3 @@ class ProductSerializer(serializers.Serializer):
         instance.quantity = validated_data.get('quantity', instance.quantity)
         instance.save()
         return instance
-
-    def destroy(self,instance,validated_data):
-        """
-        delete an existing `Product` instance, given the validated data.
-        """
-        instance.delete()
-        return HttpResponse(status=204)

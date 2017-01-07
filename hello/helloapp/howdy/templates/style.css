@@ -1,2 +1,47 @@
-pip install djangorestframework
+/*pip install djangorestframework
 mysqlclient
+
+body{
+    background-color: #B0C4DE;
+    background-image:url('{{ STATIC_URL }}images/p.jpg');
+    background-repeat:no-repeat;
+    background-size:100%;
+    color: black;
+  }
+  #update,#delete{
+    margin-left: -100px;
+  }
+  #delete{
+    color: #ff4444;
+  }
+  h2{
+    text-align: center;
+  }
+  th{
+    background-color: black;
+    color: white;
+    width: 120%;
+  }
+  th, td {
+      padding: 5px;
+  }
+  tbody{
+    overflow: auto;
+    height: 100px;
+    /*width: 40%;*/
+  }
+
+  #someid {
+  width: 50%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  }
+  th { text-decoration: underline; }
+  th, td {
+    padding: 5px;
+    text-align: center;
+  }
+  
+  #window{
+    margin-left: 20px;
+  }*/

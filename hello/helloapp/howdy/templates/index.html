@@ -1,25 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Bootstrap Example</title>
+  <title>Products</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+  `{% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
 </head>
 <style>
   body{
-    background-color: #1abc9c;
-      color: black;
+    background-color: #F5F5F5;
+    background-repeat:no-repeat;
+    background-size:100%;
+    color: black;
+  }
+  #update,#delete{
+    margin-left: -100px;
+  }
+  #delete{
+    color: #ff4444;
   }
   h2{
+    text-align: left;
+  }
+  th{
+    background-color: black;
+    color: white;
+    width: 120%;
+  }
+  th, td {
+      padding: 5px;
+  }
+  tbody{
+    overflow: auto;
+    height: 100px;
+    /*width: 40%;*/
+  }
+
+  #someid {
+  width: 50%;
+  table-layout: fixed;
+  border: solid black;
+  /*border-collapse: collapse;*/
+  }
+  th { text-decoration: underline; }
+  th, td {
+    padding: 5px;
     text-align: center;
+  }
+  
+  #window{
+    margin-left: 20px;
   }
   
 </style>
 <script type="text/javascript">
+$(document).ready(function(){
+    $(".table-striped").floatThead({scrollingTop:50});
+});
+
 (function(){
 angular.module("myApp", []);
 angular.module('myApp').config(function($interpolateProvider) {
@@ -38,7 +81,7 @@ angular.module('myApp').factory('Product',function($http){
     return $http.put('/products/'+product.id+'/',product);
   }
   Product.destroy = function(product){
-    return $http.delete('/products/'+product.id+'/',product);
+    return $http.delete('/products/'+product.id+'');
   }
   return Product;
 })
@@ -50,26 +93,32 @@ angular.module('myApp').controller("myCtrl", function($scope, Product) {
   $scope.addProduct = function(product){
     Product.create(product).then(function(response){
       $scope.products.push(response.data);
+      product = {};
     })
   }
   $scope.updateProduct = function(){
     Product.update($scope.currentProduct);
   }
+  // $scope.destroyProduct = function(idx){
+  //   Product.destroy(products[idx]).then(function(response){
+  //     $scope.products.delete(response.data);
+  // }
   $scope.destroyProduct = function(idx){
-    Product.destroy($scope.products[idx]);
+    Product.destroy($scope.products[idx]).then(function(){
+      $scope.products.splice(idx,1);
+    })
   }
   $scope.setCurrentProduct = function  (idx) {
     $scope.currentProduct = $scope.products[idx];
   }
-  $scope.title = 'Title';
 });
 })()
 </script>
 <body ng-app="myApp" ng-controller="myCtrl">
 
 <div class="container">
-  <h2>{[{ title }]}</h2>
-  <table class="table">
+  <h2>The Products</h2><br><br>
+  <table class="table table-striped" id="someid">
     <thead>
       <tr>
         <th>ID</th>
@@ -82,12 +131,15 @@ angular.module('myApp').controller("myCtrl", function($scope, Product) {
     </thead>
     <tbody>
       <tr ng-repeat="x in products">
-        <td>{[{x.id}]}</td>
-        <td>{[{x.name}]}</td>
-        <td>{[{x.quantity}]}</td>
-        <td>{[{x.category}]}</td>
-        <td> <button type="button" id="update" class="btn btn-primary" ng-click="setCurrentProduct($index)" data-toggle="modal" data-target="#updateModal">Update</button></td>
-        <td> <button type="button" id="delete" class="btn btn-danger" ng-click="destroy($index)" data-toggle="modal">Delete</button></td>
+        <td  class="col-md-1">{[{x.id}]}</td>
+        <td  class="col-md-1">{[{x.name}]}</td>
+        <td class="col-md-1">{[{x.quantity}]}</td>
+        <td class="col-md-1">{[{x.category}]}</td>
+        <td class="col-md-1"> 
+        <td><a href="" id="update" class="glyphicon glyphicon-pencil" ng-click="setCurrentProduct($index)" data-toggle="modal" data-target="#updateModal"></a></td>
+
+        <td> <a href="" id="delete" class="glyphicon glyphicon-remove" ng-click="destroyProduct($index)"></a></td>
+        
       </tr >    
     </tbody>
   </table>
@@ -106,13 +158,13 @@ angular.module('myApp').controller("myCtrl", function($scope, Product) {
         </div>
         <form>
 		  <div class="form-group" ng-init="product = {}">
-		    <label>Name</label><br>
-		    <input ng-model="product.name" type="text"><br>
-		    <label>Quantity</label><br>
-		    <input ng-model="product.quantity" type="number"><br>
-		    <label>Category</label><br>
-		    <input ng-model="product.category" type="text"><br>
-		  	<button data-dismiss="modal" ng-click="addProduct(product)" class="btn btn-primary">save</button>
+		    <label id="window">Name</label><br>
+		    <input id="window" ng-model="product.name" type="text"><br>
+		    <label id="window">Quantity</label><br>
+		    <input id="window" ng-model="product.quantity" type="number"><br>
+		    <label id="window">Category</label><br>
+		    <input id="window" ng-model="product.category" type="text"><br>
+		  	<button id="window" data-dismiss="modal" ng-click="addProduct(product)" class="btn btn-primary">save</button>
 		  </div>
 		</form>
         <div class="modal-footer">
@@ -135,13 +187,13 @@ angular.module('myApp').controller("myCtrl", function($scope, Product) {
         </div>
         <form>
 		  <div class="form-group">
-		    <label>Name</label><br>
-		    <input ng-model="currentProduct.name" type="text"><br>
-		    <label>Quantity</label><br>
-		    <input ng-model="currentProduct.quantity" type="number"><br>
-		    <label>Category</label><br>
-		    <input ng-model="currentProduct.category" type="text"><br>
-		  	<button data-dismiss="modal" ng-click="updateProduct()" class="btn btn-primary">save</button>
+		    <label id="window">Name</label><br>
+		    <input id="window" ng-model="currentProduct.name" type="text"><br>
+		    <label id="window">Quantity</label><br>
+		    <input id="window" ng-model="currentProduct.quantity" type="number"><br>
+		    <label id="window">Category</label><br>
+		    <input id="window" ng-model="currentProduct.category" type="text"><br>
+		  	<button id="window" data-dismiss="modal" ng-click="updateProduct()" class="btn btn-primary">save</button>
 		  </div>
 		</form>
         <div class="modal-footer">

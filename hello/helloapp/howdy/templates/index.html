@@ -8,8 +8,6 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-  `{% load static %}
-  <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
 </head>
 <style>
   body{
@@ -17,9 +15,6 @@
     background-repeat:no-repeat;
     background-size:100%;
     color: black;
-  }
-  #update,#delete{
-    margin-left: -100px;
   }
   #delete{
     color: #ff4444;
@@ -38,14 +33,13 @@
   tbody{
     overflow: auto;
     height: 100px;
-    /*width: 40%;*/
+   
   }
 
   #someid {
   width: 50%;
   table-layout: fixed;
   border: solid black;
-  /*border-collapse: collapse;*/
   }
   th { text-decoration: underline; }
   th, td {
@@ -76,6 +70,7 @@ angular.module('myApp').factory('Product',function($http){
   }
   Product.create = function(product){
     return $http.post('/products/',product);
+    // product = null;
   }
   Product.update = function(product){
     return $http.put('/products/'+product.id+'/',product);
@@ -93,19 +88,17 @@ angular.module('myApp').controller("myCtrl", function($scope, Product) {
   $scope.addProduct = function(product){
     Product.create(product).then(function(response){
       $scope.products.push(response.data);
-      product = {};
+      $scope.product =null;
     })
   }
   $scope.updateProduct = function(){
     Product.update($scope.currentProduct);
   }
-  // $scope.destroyProduct = function(idx){
-  //   Product.destroy(products[idx]).then(function(response){
-  //     $scope.products.delete(response.data);
-  // }
+
   $scope.destroyProduct = function(idx){
     Product.destroy($scope.products[idx]).then(function(){
       $scope.products.splice(idx,1);
+
     })
   }
   $scope.setCurrentProduct = function  (idx) {
@@ -116,95 +109,95 @@ angular.module('myApp').controller("myCtrl", function($scope, Product) {
 </script>
 <body ng-app="myApp" ng-controller="myCtrl">
 
-<div class="container">
-  <h2>The Products</h2><br><br>
-  <table class="table table-striped" id="someid">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th> 
-        <th>Quantity</th>
-        <th>Category</th>
-        <th></th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr ng-repeat="x in products">
-        <td  class="col-md-1">{[{x.id}]}</td>
-        <td  class="col-md-1">{[{x.name}]}</td>
-        <td class="col-md-1">{[{x.quantity}]}</td>
-        <td class="col-md-1">{[{x.category}]}</td>
-        <td class="col-md-1"> 
-        <td><a href="" id="update" class="glyphicon glyphicon-pencil" ng-click="setCurrentProduct($index)" data-toggle="modal" data-target="#updateModal"></a></td>
+  <div class="container">
+    <h2>The Products</h2><br><br>
+    <table class="table table-striped" id="someid">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th> 
+          <th>Quantity</th>
+          <th>Category</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="x in products">
+          <td>{[{x.id}]}</td>
+          <td>{[{x.name}]}</td>
+          <td>{[{x.quantity}]}</td>
+          <td>{[{x.category}]}</td>
+         
+          <td><a href="" id="update" class="glyphicon glyphicon-pencil" ng-click="setCurrentProduct($index)" data-toggle="modal" data-target="#updateModal"></a></td>
 
-        <td> <a href="" id="delete" class="glyphicon glyphicon-remove" ng-click="destroyProduct($index)"></a></td>
+          <td> <a href="" id="delete" class="glyphicon glyphicon-remove" ng-click="destroyProduct($index)"></a></td>
+          
+        </tr >    
+      </tbody>
+    </table>
+    <button type="button" id="add" class="btn btn-primary" data-toggle="modal" data-target="#addModal">Add</button>
+  </div>
+
+    <!-- Add Modal -->
+    <div class="modal fade" id="addModal" role="dialog">
+      <div class="modal-dialog">
+      
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Add Product</h4>
+          </div>
+          <form>
+  		  <div class="form-group">
+  		    <label id="window">Name</label><br>
+  		    <input id="window" ng-model="product.name" type="text"><br>
+  		    <label id="window">Quantity</label><br>
+  		    <input id="window" ng-model="product.quantity" type="number"><br>
+  		    <label id="window">Category</label><br>
+  		    <input id="window" ng-model="product.category" type="text"><br>
+  		  	<button id="window" data-dismiss="modal" ng-click="addProduct(product)" class="btn btn-primary">save</button>
+  		  </div>
+  		</form>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
         
-      </tr >    
-    </tbody>
-  </table>
-  <button type="button" id="add" class="btn btn-primary" data-toggle="modal" data-target="#addModal">Add</button>
-</div>
-
-  <!-- Add Modal -->
-  <div class="modal fade" id="addModal" role="dialog">
-    <div class="modal-dialog">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Add Product</h4>
-        </div>
-        <form>
-		  <div class="form-group" ng-init="product = {}">
-		    <label id="window">Name</label><br>
-		    <input id="window" ng-model="product.name" type="text"><br>
-		    <label id="window">Quantity</label><br>
-		    <input id="window" ng-model="product.quantity" type="number"><br>
-		    <label id="window">Category</label><br>
-		    <input id="window" ng-model="product.category" type="text"><br>
-		  	<button id="window" data-dismiss="modal" ng-click="addProduct(product)" class="btn btn-primary">save</button>
-		  </div>
-		</form>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
       </div>
-      
     </div>
-  </div>
 
-  <!-- Edit Modal -->
-  <div class="modal fade" id="updateModal" role="dialog">
-    <div class="modal-dialog">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Edit Product</h4>
-        </div>
-        <form>
-		  <div class="form-group">
-		    <label id="window">Name</label><br>
-		    <input id="window" ng-model="currentProduct.name" type="text"><br>
-		    <label id="window">Quantity</label><br>
-		    <input id="window" ng-model="currentProduct.quantity" type="number"><br>
-		    <label id="window">Category</label><br>
-		    <input id="window" ng-model="currentProduct.category" type="text"><br>
-		  	<button id="window" data-dismiss="modal" ng-click="updateProduct()" class="btn btn-primary">save</button>
-		  </div>
-		</form>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
+    <!-- Edit Modal -->
+    <div class="modal fade" id="updateModal" role="dialog">
+      <div class="modal-dialog">
       
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Edit Product</h4>
+          </div>
+          <form>
+  		  <div class="form-group">
+  		    <label id="window">Name</label><br>
+  		    <input id="window" ng-model="currentProduct.name" type="text"><br>
+  		    <label id="window">Quantity</label><br>
+  		    <input id="window" ng-model="currentProduct.quantity" type="number"><br>
+  		    <label id="window">Category</label><br>
+  		    <input id="window" ng-model="currentProduct.category" type="text"><br>
+  		  	<button id="window" data-dismiss="modal" ng-click="updateProduct()" class="btn btn-primary">save</button>
+  		  </div>
+  		</form>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+        
+      </div>
     </div>
+    
   </div>
-  
-</div>
 
 </body>
 </html>
